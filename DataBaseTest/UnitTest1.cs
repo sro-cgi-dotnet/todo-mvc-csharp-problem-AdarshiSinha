@@ -20,7 +20,7 @@ namespace DataBaseTest
                     checklist = new List<Checklist>{
                         new Checklist{
                             checkid = 1,
-                            write = "Submit assignment before 6:00PM",
+                            write = "nothings gonna happen",
                             ischecked=true,
                             id = 1
                         }
@@ -38,7 +38,7 @@ namespace DataBaseTest
                     checklist = new List<Checklist>{
                         new Checklist{
                             checkid = 2,
-                            write= "Try Xunit",
+                            write= "If you eat half, other half is left",
                             id=2
                         }
                     },
