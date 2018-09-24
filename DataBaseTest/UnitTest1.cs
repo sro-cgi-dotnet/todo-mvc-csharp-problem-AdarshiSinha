@@ -6,6 +6,7 @@ using helloworld.Models;
 using helloworld.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
+using System.ComponentModel;
 
 namespace DataBaseTest
 {
@@ -29,7 +30,9 @@ namespace DataBaseTest
                             labelid = 1,
                             text = "ASP.NETCore",
                             id=1
-                        }
+                        },
+                    pinned=true
+                
                 },
                 new Notes{
                     id = 2,
@@ -46,7 +49,8 @@ namespace DataBaseTest
                             labelid = 2,
                             text = "Trial",
                             id=2
-                        }
+                        },
+                    pinned=true
                     }
                 
             };
@@ -83,7 +87,29 @@ namespace DataBaseTest
             // Assert.Equal(expected, actual);
             Assert.NotNull(result);
             // Notes expected=result.Description;
-            Assert.Same(val,notes[1]);
+            Assert.Same(val.Value as Notes,notes[1]);
+
+        }
+
+         [Fact]
+        public void GetById_Negative()
+        {
+            var mockdata = new Mock<IRepo>();
+            List<Notes> notes= GetMockDatabase();
+            mockdata.Setup(d=> d.GetNotesById(3)).Returns(notes.FirstOrDefault(n=>n.id==3));
+            NotesController notescontroller = new NotesController(mockdata.Object);
+            var result= notescontroller.GetById(3);
+            var val = result as OkObjectResult;
+            // Assert.NotNull(val);
+
+            // var x = object.Value as Models.Resource;
+            // Assert.NotNull(x);
+
+            // var actual = x.Description;
+            // Assert.Equal(expected, actual);
+            Assert.Null(val);
+            // Notes expected=result.Description;
+            Assert.Same(null, val);
 
         }
 
@@ -93,11 +119,57 @@ namespace DataBaseTest
             var mockdata= new Mock<IRepo>();
             List<Notes> notes= GetMockDatabase();
             mockdata.Setup(d=>d.GetNotesByLabelortitle("Trial","title"))
-                        .Returns(notes.Where( n => n.title == "trial").ToList());
+                        .Returns(notes.Where( n => n.title == "Trial").ToList());
             NotesController notesController= new NotesController(mockdata.Object);
             var result=notesController.GetByLabels("Trial","title");
-            Assert.NotNull(result);
-            Assert.Same(result,notes);
+            var val= result as OkObjectResult;
+            Assert.NotNull(val);
+            Assert.Equal(notes.Where( n => n.title == "Trial").ToList(),val.Value as List<Notes>);
+            // Console.WriteLine(notes.Where(n => n.title == "trial").ToList());
+            // Console.WriteLine(val.Value as List<Notes>);
+            }
+
+        [Fact]
+        public void GetByLabel_Negative()
+        {
+            var mockdata= new Mock<IRepo>();
+            List<Notes> notes= GetMockDatabase();
+            mockdata.Setup(d=>d.GetNotesByLabelortitle(null,"title"))
+                        .Returns(notes.Where( n => n.title == null).ToList());
+            NotesController notesController= new NotesController(mockdata.Object);
+            var result=notesController.GetByLabels(null,"title");
+            var val= result as OkObjectResult;
+            Assert.Null(val);
+            // Console.WriteLine(val.Value as string);
+            Assert.Same(null, val);
+            // Console.WriteLine(notes.Where(n => n.title == "trial").ToList());
+            // Console.WriteLine(val.Value as List<Notes>);
+            }
+
+        [Fact]
+        public void GetByPinned_Positive()
+        {
+            var mockdata= new Mock<IRepo>();
+            List<Notes> notes= GetMockDatabase();
+            mockdata.Setup(d=> d.GetNotesByPinned(true)).Returns(notes.Where(n=> n.pinned==true).ToList());
+            NotesController notescontroller=new  NotesController(mockdata.Object);
+            var result= notescontroller.GetByPinned(true);
+            var val=result as OkObjectResult;
+            Assert.NotNull(val);
+            Assert.Equal(notes.Where(n=> n.pinned== true).ToList(),val.Value as List<Notes>);
+        }
+
+        [Fact]
+        public void GetByPinned_Negative()
+        {
+            var mockdata= new Mock<IRepo>();
+            List<Notes> notes= GetMockDatabase();
+            mockdata.Setup(d=> d.GetNotesByPinned(false)).Returns(notes.Where(n=> n.pinned==false).ToList());
+             NotesController notescontroller=new  NotesController(mockdata.Object);
+            var result= notescontroller.GetByPinned(false);
+            var val=result as OkObjectResult;
+            Assert.NotNull(val);
+            Assert.Equal(notes.Where(n=> n.pinned== false).ToList(),val.Value as List<Notes>);
 
         }
 
