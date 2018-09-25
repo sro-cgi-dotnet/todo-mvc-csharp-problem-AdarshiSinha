@@ -1,0 +1,248 @@
+swagger: "2.0"
+info:
+  description: "make backend similar to google keep"
+  version: "1.0.0"
+  title: "Notes"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "apiteam@swagger.io"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "petstore.swagger.io"
+basePath: "/v2"
+tags:
+- name: "note"
+  description: "Everything about notes"
+  externalDocs:
+    description: "Find out more"
+    url: "http://swagger.io"
+- name: "store"
+  description: "Access to Petstore orders"
+- name: "user"
+  description: "Operations about user"
+  externalDocs:
+    description: "Find out more about our store"
+    url: "http://swagger.io"
+schemes:
+- "https"
+- "http"
+paths:
+  /note:
+    post:
+      tags:
+      - "notes"
+      summary: "Add a new note to the store"
+      description: ""
+      operationId: "addPet"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "note object that needs to be added to the database"
+        required: true
+        schema:
+          $ref: "#/definitions/Pet"
+      responses:
+        405:
+          description: "Invalid input"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    put:
+      tags:
+      - "note"
+      summary: "Update an existing note"
+      description: ""
+      operationId: "updateNote"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "note object that needs to be added to the database"
+        required: true
+        schema:
+          $ref: "#/definitions/Pet"
+      responses:
+        200:
+          description:"note with id updated successfully"
+        400:
+          description: "note with id not found"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /get/{GetById}:
+    get:
+      tags:
+      - "note"
+      summary: "Get notes by id"
+      description: "returns note with id provided in the uri"
+      operationId: "GetById"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "status"
+        in: "query"
+        description: "id values that need to be considered for filter"
+        required: true
+        type: "array"
+        items:
+          type: "string"
+          enum:
+          - "available"
+          - "pending"
+          - "sold"
+          default: "available"
+        collectionFormat: "multi"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Pet"
+        400:
+          description: "Invalid status value"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /note/GetByLabelorTitle:
+    get:
+      tags:
+      - "note"
+      summary: "Find notes by Label or title"
+      description: "returns notes whose title or label matches."
+      operationId: "GetByLabelorTitle"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "string""type"
+        in: "query"
+        description: "strings to filter by"
+        required: true
+        type: "list"
+        items:
+          type: "Notes"
+        collectionFormat: "multi"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Pet"
+        400:
+          description: "Invalid tag value"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+      deprecated: true
+  /note/{pinned}:
+    get:
+      tags:
+      - "note"
+      summary: "Find note by pinned"
+      description: "Returns those notes whose pinned value is given in uri"
+      operationId: "getByPinned"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "innedp"
+        in: "path"
+        description: "notes of pinned given to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "notes with pinned value returned as list of objects"
+          schema:
+            $ref: "#/definitions/note"
+        404:
+          description: "notes with given pinned value not found"
+      security:
+      - api_key: []
+    post:
+      tags:
+      - "note"
+      summary: "posts a new note"
+      description: ""
+      operationId: "PostNotes"
+      consumes:
+      - "body"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "notes"
+        in: "body"
+        description: "note from the body posted with autogenerated ids"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "name"
+        in: "formData"
+        description: "post notes"
+        required: false
+        type: "string"
+      - name: "status"
+        in: "formData"
+        description: "post notes"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description:"Posted Successfully"
+        400:
+          description: "notvalid.try again. "
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    delete:
+      tags:
+      - "note"
+      summary: "Deletes a note of id given in path"
+      description: "returns ok if note has been deleted, error if no such id has been found"
+      operationId: "deleteNotes"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: false
+        type: "string"
+      - name: "petId"
+        in: "path"
+        description: "Pet id to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "Note with id deleted"
+        400:
+          description: "Invalid ID supplied"
+      
+    
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"
